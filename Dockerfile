@@ -21,12 +21,12 @@ WORKDIR /var/www
 # Sao chép mã nguồn Laravel vào container
 COPY . .
 
+COPY composer.json composer.lock /var/www/
 # Cấp quyền cho thư mục storage và bootstrap/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-
+RUN php composer.phar  install
 # Cài đặt các package của Laravel
-RUN php composer.phar update --prefer-dist --no-scripts --no-dev --optimize-autoloader
-
+RUN ls -llath
 # Expose port 8000 để truy cập ứng dụng
 EXPOSE 8000
 
