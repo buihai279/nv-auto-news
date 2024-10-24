@@ -1,40 +1,34 @@
 # Stage 1: Build stage để cài đặt các gói dependencies của PHP và Composer
-FROM php:8.2-fpm-alpine as builder
+FROM php:8.2-fpm AS builder
+# Sử dụng PHP phiên bản 8.1 (hoặc tùy theo yêu cầu của dự án)
 
-# Cài đặt các dependency hệ thống và PHP extensions cần thiết
-RUN apk add --no-cache \
-    curl \
-    bash \
-#    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install exif pcntl
+# Cài đặt các extension cần thiết
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql zip
 
-# Thiết lập thư mục làm việc
-WORKDIR /var/www/html
+# Cài đặt Composer
 
-# Copy file composer trước để tận dụng caching (nếu composer.json không thay đổi, sẽ không cần cài đặt lại)
-COPY composer.json composer.lock composer.phar  ./
+# Thiết lập thư mục làm việc cho Laravel
+WORKDIR /var/www
 
-# Cài đặt các gói Composer mà không cần các dev dependencies
-RUN php composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-scripts --no-progress --no-interaction
+# Sao chép mã nguồn Laravel vào container
+COPY . .
 
-# Stage 2: Production stage
-FROM php:8.2-fpm-alpine
+# Cấp quyền cho thư mục storage và bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Copy các PHP extensions đã cài đặt từ builder stage
-COPY --from=builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
-COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
+# Cài đặt các package của Laravel
+RUN php composer.phar update --prefer-dist --no-scripts --no-dev --optimize-autoloader
 
-# Copy thư mục làm việc từ builder stage
-COPY --from=builder /var/www/html /var/www/html
-COPY . /var/www/html
-RUN ls -llath /var/www/html
-# Thiết lập quyền cho thư mục storage và bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+# Expose port 8000 để truy cập ứng dụng
+EXPOSE 8000
 
-# Mở cổng 9000 cho PHP-FPM
-EXPOSE 9000
-
-# Lệnh mặc định khởi chạy PHP-FPM
-CMD ["php-fpm"]
+# Command để chạy Laravel bằng PHP built-in server
+CMD php artisan serve --host=0.0.0.0 --port=8000
