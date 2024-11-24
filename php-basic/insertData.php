@@ -1,19 +1,25 @@
 <?php
+require_once 'env.php';
+loadEnv();
+
 header("Content-Type: application/json");
 
-// Kết nối MongoDB
+// Kết nối MongoDB từ .env
+$mongoUri = getenv('MONGO_URI');
+$mongoDb = getenv('MONGO_DB');
+$mongoCollection = getenv('MONGO_COLLECTION');
+
 try {
-    $mongo = new MongoClient("mongodb://localhost:27017");
-    $db = $mongo->selectDB("ten_cua_database"); // Thay bằng tên database
-    $collection = $db->selectCollection("ten_cua_collection"); // Thay bằng tên collection
+    $mongo = new MongoClient($mongoUri);
+    $db = $mongo->selectDB($mongoDb);
+    $collection = $db->selectCollection($mongoCollection);
 } catch (MongoConnectionException $e) {
     echo json_encode(["success" => false, "message" => "Không thể kết nối tới MongoDB."]);
     exit;
 }
 
-// Kiểm tra nếu payload được gửi lên
+// Xử lý payload
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Lấy dữ liệu JSON từ payload
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {

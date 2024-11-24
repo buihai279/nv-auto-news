@@ -1,30 +1,33 @@
 <?php
+require_once 'env.php';
+loadEnv();
+
 header("Content-Type: application/json");
 
-// Đặt thư mục lưu trữ ảnh
-$targetDir = "uploads/";
+// Lấy cấu hình từ .env
+$uploadPath = getenv('UPLOAD_PATH');
+$maxFileSize = getenv('MAX_FILE_SIZE');
+$allowedFileTypes = explode(',', getenv('ALLOWED_FILE_TYPES'));
 
 // Tạo thư mục nếu chưa tồn tại
-if (!is_dir($targetDir)) {
-    mkdir($targetDir, 0777, true);
+if (!is_dir($uploadPath)) {
+    mkdir($uploadPath, 0777, true);
 }
 
 // Kiểm tra nếu có file được gửi lên
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES["image"])) {
-    $targetFile = $targetDir . basename($_FILES["image"]["name"]);
-    $uploadOk = 1;
+    $targetFile = $uploadPath . '/' . basename($_FILES["image"]["name"]);
     $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    // Kiểm tra kích thước file (tối đa 2MB)
-    if ($_FILES["image"]["size"] > 2000000) {
-        echo json_encode(["success" => false, "message" => "File quá lớn. Giới hạn 2MB."]);
+    // Kiểm tra kích thước file
+    if ($_FILES["image"]["size"] > $maxFileSize) {
+        echo json_encode(["success" => false, "message" => "File quá lớn. Giới hạn " . ($maxFileSize / 1000000) . "MB."]);
         exit;
     }
 
-    // Chỉ chấp nhận định dạng ảnh
-    $allowedTypes = ["jpg", "jpeg", "png", "gif"];
-    if (!in_array($fileType, $allowedTypes)) {
-        echo json_encode(["success" => false, "message" => "Chỉ chấp nhận các file JPG, JPEG, PNG, GIF."]);
+    // Kiểm tra loại file
+    if (!in_array($fileType, $allowedFileTypes)) {
+        echo json_encode(["success" => false, "message" => "Chỉ chấp nhận các file: " . implode(', ', $allowedFileTypes) . "."]);
         exit;
     }
 
