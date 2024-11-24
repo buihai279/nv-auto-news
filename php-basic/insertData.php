@@ -48,7 +48,7 @@ try {
 
     // Kiểm tra dữ liệu đầu vào
     if (empty($data) || !is_array($data)) {
-        echo json_encode(["success" => false, "message" => "Dữ liệu đầu vào không hợp lệ."]);
+        echo json_encode(["success" => false, "message" => "Dữ liệu đầu vào không hợp lệ.", "data" => $data]);
         exit;
     }
 
