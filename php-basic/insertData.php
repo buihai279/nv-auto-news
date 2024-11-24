@@ -29,8 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Chèn dữ liệu vào MongoDB
     try {
-        $collection->insert($data);
-        echo json_encode(["success" => true, "message" => "Dữ liệu đã được chèn vào MongoDB."]);
+      $result=   $collection->insert($data,['safe' => true]);
+        echo json_encode(["success" => true, "message" => "Dữ liệu đã được chèn vào MongoDB.", "data" => $result]);
     } catch (MongoCursorException $e) {
         echo json_encode(["success" => false, "message" => "Lỗi khi chèn dữ liệu: " . $e->getMessage()]);
     }
