@@ -26,6 +26,12 @@ function formatData($data) {
             // Nếu là chuỗi dài 24 ký tự, coi như ObjectId
             return new MongoId($data);
         }
+
+        // Kiểm tra xem chuỗi có phải là định dạng thời gian ISODate hay không
+        if (strtotime($data)) {
+            // Nếu chuỗi có thể chuyển đổi thành thời gian hợp lệ, coi nó là một thời gian
+            return new MongoDate(strtotime($data));
+        }
     } elseif (is_int($data)) {
         // Nếu là số nguyên, chuyển đổi sang MongoInt64
         return new MongoInt64($data);
@@ -48,7 +54,7 @@ try {
         exit;
     }
 
-    // Chuyển đổi dữ liệu tự động (ObjectId và MongoInt64)
+    // Chuyển đổi dữ liệu tự động (ObjectId, MongoInt64 và MongoDate)
     $formattedData = formatData($data);
 
     // Chèn dữ liệu vào MongoDB
