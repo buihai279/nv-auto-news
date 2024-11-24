@@ -48,6 +48,6 @@ class AddController extends Controller
             'created' => now(),
             'modified' => now()
         ];
-        Http::post('http://127.0.0.1:8002', $data);
+        Http::post('http://host.docker.internal:8002', $data);
     }
 }
