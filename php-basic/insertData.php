@@ -4,37 +4,64 @@ loadEnv();
 
 header("Content-Type: application/json");
 
-// Kết nối MongoDB từ .env
+// Kết nối MongoDB
 $mongoUri = getenv('MONGO_URI');
 $mongoDb = getenv('MONGO_DB');
 $mongoCollection = getenv('MONGO_COLLECTION');
+
+function formatData($data) {
+    if (is_array($data)) {
+        // Nếu là mảng, lặp qua từng phần tử và xử lý
+        foreach ($data as $key => $value) {
+            $data[$key] = formatData($value);
+        }
+    } elseif (is_object($data)) {
+        // Nếu là đối tượng, gọi đệ quy cho từng thuộc tính
+        foreach ($data as $key => $value) {
+            $data->$key = formatData($value);
+        }
+    } elseif (is_string($data)) {
+        // Kiểm tra xem chuỗi có phải là ObjectId hay không
+        if (preg_match('/^[a-fA-F0-9]{24}$/', $data)) {
+            // Nếu là chuỗi dài 24 ký tự, coi như ObjectId
+            return new MongoId($data);
+        }
+    } elseif (is_int($data)) {
+        // Nếu là số nguyên, chuyển đổi sang MongoInt64
+        return new MongoInt64($data);
+    }
+    return $data;
+}
 
 try {
     $mongo = new MongoClient($mongoUri);
     $db = $mongo->selectDB($mongoDb);
     $collection = $db->selectCollection($mongoCollection);
-} catch (MongoConnectionException $e) {
-    echo json_encode(["success" => false, "message" => "Không thể kết nối tới MongoDB."]);
-    exit;
-}
 
-// Xử lý payload
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $data = json_decode(file_get_contents("php://input"), true);
+    // Nhận dữ liệu từ client (giả sử là JSON payload)
+    $input = file_get_contents("php://input");
+    $data = json_decode($input, true);
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        echo json_encode(["success" => false, "message" => "Payload không hợp lệ."]);
+    // Kiểm tra dữ liệu
+    if (empty($data) || !is_array($data)) {
+        echo json_encode(["success" => false, "message" => "Dữ liệu đầu vào không hợp lệ."]);
         exit;
     }
 
+    // Chuyển đổi dữ liệu tự động (ObjectId và MongoInt64)
+    $formattedData = formatData($data);
+
     // Chèn dữ liệu vào MongoDB
-    try {
-      $result=   $collection->insert($data,['safe' => true]);
-        echo json_encode(["success" => true, "message" => "Dữ liệu đã được chèn vào MongoDB.", "data" => $result]);
-    } catch (MongoCursorException $e) {
-        echo json_encode(["success" => false, "message" => "Lỗi khi chèn dữ liệu: " . $e->getMessage()]);
+    $result = $collection->insert($formattedData);
+
+    if ($result) {
+        echo json_encode(["success" => true, "message" => "Dữ liệu đã chèn thành công."]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Chèn dữ liệu thất bại."]);
     }
-} else {
-    echo json_encode(["success" => false, "message" => "Chỉ hỗ trợ phương thức POST."]);
+} catch (MongoConnectionException $e) {
+    echo json_encode(["success" => false, "message" => "Không thể kết nối tới MongoDB: " . $e->getMessage()]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 ?>
