@@ -23,7 +23,7 @@ COPY . .
 
 COPY composer.json composer.lock /var/www/
 # Cấp quyền cho thư mục storage và bootstrap/cache
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/database /var/www/storage /var/www/bootstrap/cache
 RUN php composer.phar  install
 # Cài đặt các package của Laravel
 RUN php artisan migrate

@@ -11,6 +11,7 @@ class CrawlerUrl extends Model
         'is_crawled',
         'title',
         'site',
+        'html',
         'body',
         'images',
         'thumbnail',

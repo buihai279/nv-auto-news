@@ -6,8 +6,10 @@ services:
       dockerfile: Dockerfile
     container_name: laravel_app
     ports:
-      - "8001:8000"
+      - "8003:8000"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - SESSION_DRIVER=file
+      - DB_CONNECTION=sqlite
       - APP_KEY=base64:462H/eaL/ir7mEa3Yj4uAc/PGLGoy2aHm2ASq1OVF+U=

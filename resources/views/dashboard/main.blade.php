@@ -9,24 +9,33 @@
 </head>
 
 <body class="m-4">
-    <table class="table-auto" border="1">
+    <table class="table-auto table-bordered" border="1">
         <thead>
-            <tr>
-                <th class="px-4 py-2">ID</th>
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Email</th>
-                <th class="px-4 py-2">Created At</th>
-                <th class="px-4 py-2">Updated At</th>
+            <tr class="">
+                <th class="px-4 py-2">site</th>
+                <th class="px-4 py-2">link</th>
+                <th class="px-4 py-2" colspan="4">Publish</th>
             </tr>
         </thead>
         <tbody>
             @foreach($newss as $user)
             <tr>
                 <td class="border px-4 py-2">{{ $user['site'] }}</td>
-                <td class="border px-4 py-2">{{ $user['url'] }}</td>
+                <td class="border px-4 py-2"><a href="{{ $user['url'] }}">{{ $user['title'] }}</a></td>
+                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Xem tin</a></td>
+                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên NVGATE</a></td>
+                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Mfilm</a></td>
+                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Vfilm</a></td>
+                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Balodi</a></td>
             </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7" class="border px-4 py-2">
+                    {{$newss->links()}}
+                </td>
+            </tr>
     </table>
 </body>
 
