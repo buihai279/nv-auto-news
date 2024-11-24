@@ -26,7 +26,7 @@ COPY composer.json composer.lock /var/www/
 RUN chown -R www-data:www-data /var/www/database /var/www/storage /var/www/bootstrap/cache
 RUN php composer.phar  install
 # Cài đặt các package của Laravel
-RUN php artisan migrate
+#RUN php artisan migrate
 # Expose port 8000 để truy cập ứng dụng
 EXPOSE 8000
 

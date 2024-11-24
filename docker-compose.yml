@@ -13,3 +13,6 @@ services:
       - SESSION_DRIVER=file
       - DB_CONNECTION=sqlite
       - APP_KEY=base64:462H/eaL/ir7mEa3Yj4uAc/PGLGoy2aHm2ASq1OVF+U=
+    volumes:
+        - .:/var/www
+
