@@ -14,14 +14,14 @@ class TestController extends Controller
             '/khoe-dep.htm',
             '/dinh-duong.htm'
         ];
-//        foreach ($list as $item) {
-//            Crawler::create()
-//                ->setTotalCrawlLimit(1)
-//                ->setMaximumDepth(2)
-//                ->setConcurrency(1)
-//                ->setCrawlObserver(new CrawlerListSKDSNews())
-//                ->startCrawling('https://suckhoedoisong.vn'.$item);
-//        }
+        foreach ($list as $item) {
+            Crawler::create()
+                ->setTotalCrawlLimit(1)
+                ->setMaximumDepth(2)
+                ->setConcurrency(1)
+                ->setCrawlObserver(new CrawlerListSKDSNews())
+                ->startCrawling('https://suckhoedoisong.vn'.$item);
+        }
         return view('dashboard.main', ['newss' => CrawlerUrl::orderByDesc('id')->paginate(10)]);
     }
 }
