@@ -48,6 +48,6 @@ class AddController extends Controller
             'created' => now(),
             'modified' => now()
         ];
-        Http::post('http://host.docker.external:8002', $data);
+        Http::post('http://app.nvgate.vn/8007', $data);
     }
 }
