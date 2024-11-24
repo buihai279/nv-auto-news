@@ -18,6 +18,7 @@ class AddController extends Controller
     {
         $detail = CrawlerUrl::firstWhere('url', $request->input('url'))->first();
         $data = [
+            "collection_name"=> "news",// Tên collection
             'name' => $detail->name,
             'name_ascii' => Str::slug($detail->name),
             'url_alias' => Str::slug($detail->name),
