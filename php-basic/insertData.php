@@ -7,7 +7,6 @@ header("Content-Type: application/json");
 // Kết nối MongoDB
 $mongoUri = getenv('MONGO_URI');
 $mongoDb = getenv('MONGO_DB');
-$mongoCollection = getenv('MONGO_COLLECTION');
 
 function formatData($data) {
     if (is_array($data)) {
@@ -42,17 +41,37 @@ function formatData($data) {
 try {
     $mongo = new MongoClient($mongoUri);
     $db = $mongo->selectDB($mongoDb);
-    $collection = $db->selectCollection($mongoCollection);
 
     // Nhận dữ liệu từ client (giả sử là JSON payload)
     $input = file_get_contents("php://input");
     $data = json_decode($input, true);
 
-    // Kiểm tra dữ liệu
+    // Kiểm tra dữ liệu đầu vào
     if (empty($data) || !is_array($data)) {
         echo json_encode(["success" => false, "message" => "Dữ liệu đầu vào không hợp lệ."]);
         exit;
     }
+
+    // Kiểm tra xem có trường "collection_name" trong body hay không
+    if (!isset($data['collection_name'])) {
+        echo json_encode(["success" => false, "message" => "Chưa có tên collection trong dữ liệu."]);
+        exit;
+    }
+
+    // Lấy tên collection từ body
+    $collectionName = $data['collection_name'];
+
+    // Kiểm tra xem tên collection có hợp lệ không (chắc chắn là chuỗi không rỗng)
+    if (empty($collectionName)) {
+        echo json_encode(["success" => false, "message" => "Tên collection không hợp lệ."]);
+        exit;
+    }
+
+    // Chọn collection tương ứng
+    $collection = $db->selectCollection($collectionName);
+
+    // Xóa trường "collection_name" trước khi lưu dữ liệu vào MongoDB
+    unset($data['collection_name']);
 
     // Chuyển đổi dữ liệu tự động (ObjectId, MongoInt64 và MongoDate)
     $formattedData = formatData($data);

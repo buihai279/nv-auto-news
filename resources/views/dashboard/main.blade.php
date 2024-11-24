@@ -23,7 +23,7 @@
                 <td class="border px-4 py-2">{{ $user['site'] }}</td>
                 <td class="border px-4 py-2"><a href="{{ $user['url'] }}">{{ $user['title'] }}</a></td>
                 <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Xem tin</a></td>
-                <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên NVGATE</a></td>
+                <td class="border px-4 py-2"><a href="{{route('add',['url'=>$user['url'],'site'=>'NVGATE'])}}">Đăng lên NVGATE</a></td>
                 <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Mfilm</a></td>
                 <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Vfilm</a></td>
                 <td class="border px-4 py-2"><a href="{{route('detail',['url'=>$user['url']])}}">Đăng lên Balodi</a></td>
