@@ -8,11 +8,11 @@ use Spatie\Crawler\CrawlObservers\CrawlObserver;
 use Symfony\Component\DomCrawler\Crawler;
 use voku\helper\HtmlDomParser;
 
-class CrawlerListVNENews extends CrawlObserver
+class CrawlerListZingNews extends CrawlObserver
 {
     //const domain
-    public $domain = 'https://vnexpress.net/';
-    public $sitename = 'vnexpress';
+    public $domain = 'https://znews.vn/';
+    public $sitename = 'znews';
 
     public function willCrawl($url, ?string $linkText): void
     {
@@ -25,10 +25,15 @@ class CrawlerListVNENews extends CrawlObserver
         $html = $response->getCachedBody();
 
         $dom = HtmlDomParser::str_get_html($html);
-        foreach ($dom->find('.item-news') as $a) {
+        foreach ($dom->find('.article-item') as $a) {
             $url = $a->findOne('a')->getAttribute('href');
-            $linkText = $a->findOne('.title-news')->text();
-            if (empty($url)||empty($linkText)) {
+            $linkText = $a->findOne('.article-title')->text();
+            $src = $a->findOne('img')->getAttribute('src');
+            if (Str::contains($src, 'data:image')) {
+                $src = $a->findOne('img')->getAttribute('data-src');
+            }
+
+            if (!Str::contains($url, '-post') || empty($src)) {
                 continue;
             }
             CrawlerUrl::updateOrCreate([
@@ -36,6 +41,7 @@ class CrawlerListVNENews extends CrawlObserver
             ], [
                 'url' => $url,
                 'title' => trim($linkText),
+                'thumbnail' => $src,
                 'site' => $this->sitename
             ]);
 

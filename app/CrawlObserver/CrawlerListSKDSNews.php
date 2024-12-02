@@ -8,6 +8,9 @@ use Spatie\Crawler\CrawlObservers\CrawlObserver;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerListSKDSNews extends CrawlObserver {
+    //const domain
+    public $domain = 'https://suckhoedoisong.vn';
+    public $sitename = 'suckhoedoisong';
     public function willCrawl($url, ?string $linkText): void
     {
 //                    echo "Crawling: $url" . PHP_EOL;
@@ -27,12 +30,12 @@ class CrawlerListSKDSNews extends CrawlObserver {
 
         foreach ($nodes as $node) {
             CrawlerUrl::firstOrCreate([
-                'url' =>"https://suckhoedoisong.vn". $node->getAttribute('href'),
-                'site' => 'suckhoedoisong',
-            ],[
-                'url' => "https://suckhoedoisong.vn".$node->getAttribute('href'),
+                'url' => $this->domain . $node->getAttribute('href'),
+                'site' =>$this->sitename
+            ], [
+                'url' => $this->domain . $node->getAttribute('href'),
                 'title' => $node->getAttribute('title'),
-                'site' => 'suckhoedoisong',
+                'site' =>$this->sitename
             ]);
         }
     }
