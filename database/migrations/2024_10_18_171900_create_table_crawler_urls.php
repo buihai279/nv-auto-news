@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->string('url');
             $table->boolean('is_crawled')->default(false);
             $table->tinyText('site');
+            $table->mediumText('html');
             $table->json('images')->nullable();
             $table->json('thumbnail')->nullable();
             $table->timestamp('nvgate_publish_at')->nullable();
