@@ -25,9 +25,6 @@ class CrawlerListSKDSNews extends CrawlObserver {
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->query('//a[@class="box-home-focus-link-title"]');
 
-
-
-
         foreach ($nodes as $node) {
             CrawlerUrl::firstOrCreate([
                 'url' => $this->domain . $node->getAttribute('href'),

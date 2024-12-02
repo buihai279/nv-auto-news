@@ -11,8 +11,21 @@ services:
       - APP_ENV=local
       - APP_DEBUG=true
       - SESSION_DRIVER=file
-      - DB_CONNECTION=sqlite
+      - DB_CONNECTION=pgsql
       - APP_KEY=base64:462H/eaL/ir7mEa3Yj4uAc/PGLGoy2aHm2ASq1OVF+U=
+      - DB_URL=pgsql://root:ir7mEa3Yj4uAc@postgres:5432/auto-news
     volumes:
         - .:/var/www
-
+  postgres:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=auto-news
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=ir7mEa3Yj4uAc
+    ports:
+      - "8432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:

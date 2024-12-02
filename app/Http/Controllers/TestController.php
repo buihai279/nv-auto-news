@@ -15,14 +15,11 @@ class TestController extends Controller
     public function __invoke()
     {
         $list1 = [
-            '/khoe-dep.htm',
-            '/dinh-duong.htm'
+            'https://suckhoedoisong.vn/khoe-dep.htm',
+            'https://suckhoedoisong.vn/dinh-duong.htm'
         ];
         $list2 = [
-            '/du-lich.html'
-        ];
-        $list = [
-            '/du-lich'
+            'https://znews.vn/du-lich.html'
         ];
         Crawler::create()
             ->setTotalCrawlLimit(1)
@@ -42,25 +39,6 @@ class TestController extends Controller
                 ->setMaximumDepth(2)
                 ->setCrawlObserver(new CrawlerListZingNews())
                 ->startCrawling($item);
-        }
-        foreach ($list as $item) {
-//            Crawler::create()
-//                ->setTotalCrawlLimit(1)
-//                ->setMaximumDepth(2)
-//                ->setCrawlObserver(new CrawlerListZingNews())
-//                ->startCrawling('https://znews.vn'.$item);
-//            Crawler::create()
-//                ->setTotalCrawlLimit(1)
-//                ->setMaximumDepth(2)
-//                ->setCrawlObserver(new CrawlerListVNENews())
-//                ->startCrawling('https://vnexpress.net'.$item);
-
-            //            Crawler::create()
-//                ->setTotalCrawlLimit(1)
-//                ->setMaximumDepth(2)
-//                ->setConcurrency(1)
-//                ->setCrawlObserver(new CrawlerListSKDSNews())
-//                ->startCrawling('https://suckhoedoisong.vn'.$item);
         }
         return view('dashboard.main', ['newss' => CrawlerUrl::orderByDesc('id')->paginate(10)]);
     }

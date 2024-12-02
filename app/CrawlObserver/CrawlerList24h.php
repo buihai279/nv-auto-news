@@ -20,7 +20,6 @@ class CrawlerList24h extends CrawlObserver
 
     public function crawled($url, $response, UriInterface|\Psr\Http\Message\UriInterface|null $foundOnUrl = null, ?string $linkText = null): void
     {
-
         Log::info('Crawled: ' . $url);
         $html = $response->getCachedBody();
 

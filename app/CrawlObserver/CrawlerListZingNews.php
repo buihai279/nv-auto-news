@@ -36,14 +36,18 @@ class CrawlerListZingNews extends CrawlObserver
             if (!Str::contains($url, '-post') || empty($src)) {
                 continue;
             }
-            CrawlerUrl::updateOrCreate([
-                'url' => $url
-            ], [
-                'url' => $url,
-                'title' => trim($linkText),
-                'thumbnail' => $src,
-                'site' => $this->sitename
-            ]);
+            try {
+                CrawlerUrl::updateOrCreate([
+                    'url' => $url
+                ], [
+                    'url' => $url,
+                    'title' => trim($linkText),
+                    'thumbnail' => $src,
+                    'site' => $this->sitename
+                ]);
+            } catch (\Exception $e) {
+                continue;
+            }
 
         }
     }
