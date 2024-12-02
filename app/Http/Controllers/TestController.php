@@ -14,14 +14,14 @@ class TestController extends Controller
 {
     public function __invoke()
     {
-        $list =[
+        $list1 = [
             '/khoe-dep.htm',
             '/dinh-duong.htm'
         ];
-        $list =[
+        $list2 = [
             '/du-lich.html'
         ];
-        $list =[
+        $list = [
             '/du-lich'
         ];
         Crawler::create()
@@ -29,7 +29,20 @@ class TestController extends Controller
             ->setMaximumDepth(2)
             ->setCrawlObserver(new CrawlerList24h())
             ->startCrawling('https://www.24h.com.vn/du-lich-24h-c76.html');
-
+        foreach ($list1 as $item) {
+            Crawler::create()
+                ->setTotalCrawlLimit(1)
+                ->setMaximumDepth(2)
+                ->setCrawlObserver(new CrawlerListSKDSNews())
+                ->startCrawling($item);
+        }
+        foreach ($list2 as $item) {
+            Crawler::create()
+                ->setTotalCrawlLimit(1)
+                ->setMaximumDepth(2)
+                ->setCrawlObserver(new CrawlerListZingNews())
+                ->startCrawling($item);
+        }
         foreach ($list as $item) {
 //            Crawler::create()
 //                ->setTotalCrawlLimit(1)
