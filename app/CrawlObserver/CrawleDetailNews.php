@@ -3,13 +3,12 @@
 namespace App\CrawlObserver;
 
 use App\Models\CrawlerUrl;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Spatie\Crawler\CrawlObservers\CrawlObserver;
 use voku\helper\HtmlDomParser;
 
-class CrawleDetailSKDSNews extends CrawlObserver
+class CrawleDetailNews extends CrawlObserver
 {
     public function willCrawl($url, ?string $linkText): void
     {
@@ -18,6 +17,7 @@ class CrawleDetailSKDSNews extends CrawlObserver
 
     public function crawled($url, $response, UriInterface|\Psr\Http\Message\UriInterface|null $foundOnUrl = null, ?string $linkText = null): void
     {
+        Log::info('Crawled: ' . $url);
         $html = $response->getCachedBody();
         $html = HtmlDomParser::str_get_html($html);
         if (Str::contains($url, 'suckhoedoisong')) {
@@ -29,7 +29,7 @@ class CrawleDetailSKDSNews extends CrawlObserver
         if (Str::contains($url, 'vnexpress')) {
             $this->vnexpress($url, $html);
         }
-        if (Str::contains($url, '24h')) {
+        if (Str::contains($url, 'www.24h.com.vn/du-lich-24h')) {
             $this->_24h($url, $html);
         }
 
@@ -48,7 +48,7 @@ class CrawleDetailSKDSNews extends CrawlObserver
         $html = Str::replace('<h4>Mời bạn đọc xem tiếp video:</h4>', '', $html);
         $html = Str::replace('<p><b>Xem thêm video đang được quan tâm:</b></p>', '', $html);
         $html = Str::replace('<h3>Xem thêm video đang được quan tâm:</h3>', '', $html);
-        CrawlerUrl::updateOrCreate([
+   CrawlerUrl::updateOrCreate([
             'url' => $url,
             'site' => 'suckhoedoisong',
         ], [
@@ -69,11 +69,24 @@ class CrawleDetailSKDSNews extends CrawlObserver
     {
         $dom = HtmlDomParser::str_get_html($dom->findOne('.cate-24h-foot-arti-deta-info')->outerhtml);
         foreach ($dom->find('img') as $a) {
-            $a->setAttribute('src', $a->getAttribute('data-original'));
-            $a->removeAttribute('data-original');
-            $file = $file ?? $a->getAttribute('src');
+            $curFile = $a->getAttribute('src');
+            if (Str::contains( $a->getAttribute('src'),'data:image')) {
+                $a->setAttribute('src', $a->getAttribute('data-original'));
+                $curFile = $a->getAttribute('data-original');
+                $a->removeAttribute('data-original');
+            }
+            $file = $file ?? $curFile;
         }
         foreach ($dom->find('span') as $a) {
+            $a->removeAttribute('style');
+        }
+        foreach ($dom->find('a') as $a) {
+            $a->removeAttribute('style');
+        }
+        foreach ($dom->find('img') as $a) {
+            $a->removeAttribute('style');
+        }
+        foreach ($dom->find('div') as $a) {
             $a->removeAttribute('style');
         }
         foreach ($dom->find('script') as $a) {
@@ -81,18 +94,19 @@ class CrawleDetailSKDSNews extends CrawlObserver
         }
 
         $dom->findOne('.bv-lq')->delete();
+        $dom->findOne('.linkOrigin')->delete();
         $dom->findOne('#zone_banner_sponser_product')->delete();
+        $dom->findOne('#24h-banner-in-image')->delete();
+        echo $html = $dom->outerhtml;
 
-       echo $html = $dom->outerhtml;
-        CrawlerUrl::updateOrCreate([
+CrawlerUrl::updateOrCreate([
             'url' => $url,
-            'site' => '24h',
         ], [
             'html' => $html,
-            'thumbnail' => $file ?? '',
+//            'thumbnail' => $file ?? '',
+//            'title' => $dom->findOne('h1')->text(),
         ]);
     }
-
     public function znews($url, $dom)
     {
         $domOrigin = $dom;

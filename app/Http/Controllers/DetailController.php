@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\CrawlObserver\CrawleDetailSKDSNews;
-use App\CrawlObserver\CrawlerListSKDSNews;
-use App\CrawlQueue\DetailCrawlQueue;
+use App\CrawlObserver\CrawleDetailNews;
 use App\Models\CrawlerUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Spatie\Crawler\Crawler;
 use voku\helper\HtmlDomParser;
 
 class DetailController extends Controller
 {
-    public $JSESSIONID = "JSESSIONID=FC527FA3AFC82D89A963D2453EEB6CE9; JSESSIONID=FC527FA3AFC82D89A963D2453EEB6CE9";
+    public $JSESSIONID = "JSESSIONID=9252003605F5DCEBAFB8D486DA3DEF5A; JSESSIONID=9252003605F5DCEBAFB8D486DA3DEF5A";
     public $id = "5f785eb27479e164987b18960632d962637069a339e7d386a7c8597668a3e88c";
 
     public function __invoke(Request $request)
     {
-        foreach (CrawlerUrl::where('site', '24h')->get() as $crawler) {
-            $this->sendContentPostBalody($crawler);
-        }die;
+//        foreach (CrawlerUrl::where('site', '24h')->limit(300)->get() as $crawler) {
+//            $this->sendContentPostBalody($crawler);
+
+//            //2
+//            Crawler::create()
+////            ->setCrawlQueue($queue)
+//                ->setCurrentCrawlLimit(2)
+//                ->setMaximumDepth(2)
+//                ->setCrawlObserver(new CrawleDetailNews())
+//                ->startCrawling($crawler->url);
+//        }die;
         $url = $request->url;
         $crawler = CrawlerUrl::where('url', $url)->first();
         if (empty($crawler->html)) {
@@ -32,7 +37,7 @@ class DetailController extends Controller
 //            ->setCrawlQueue($queue)
                 ->setCurrentCrawlLimit(2)
                 ->setMaximumDepth(2)
-                ->setCrawlObserver(new CrawleDetailSKDSNews())
+                ->setCrawlObserver(new CrawleDetailNews())
                 ->startCrawling($url);
         }
         if ($crawler->site == '24h') {
@@ -100,7 +105,6 @@ class DetailController extends Controller
     {
         //cache
         return Cache::remember($thumbnail, 60 * 60 * 24, function () use ($thumbnail) {
-
             $url = 'https://cepcms.vnptvas.vn/upload_img?sessionkey=' . $this->getSessionId();
             // Headers cần gửi
             $headers = [

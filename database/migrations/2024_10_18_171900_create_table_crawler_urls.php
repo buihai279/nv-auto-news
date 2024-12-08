@@ -11,11 +11,9 @@ return new class extends Migration {
             $table->id();
             $table->string('title')->default("");
             $table->string('url');
-            $table->boolean('is_crawled')->default(false);
             $table->tinyText('site');
             $table->mediumText('html')->nullable();
-            $table->json('images')->nullable();
-            $table->json('thumbnail')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->timestamp('nvgate_publish_at')->nullable();
             $table->timestamp('vfilm_publish_at')->nullable();
             $table->timestamp('mfilm_publish_at')->nullable();

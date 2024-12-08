@@ -8,12 +8,9 @@ class CrawlerUrl extends Model
 {
     protected $fillable = [
         'url',
-        'is_crawled',
         'title',
         'site',
         'html',
-        'body',
-        'images',
         'thumbnail',
         'nvgate_publish_at',
         'vfilm_publish_at',
