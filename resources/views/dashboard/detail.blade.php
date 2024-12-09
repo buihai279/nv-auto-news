@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN link -->
 </head>
 
-<body class="m-4">
+<body style="width: 700px;margin-left: 300px ">
 {!! $html !!}
 </body>
 

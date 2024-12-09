@@ -16,6 +16,15 @@ class TestController extends Controller
 {
     public function __invoke()
     {
+
+//        $time = strtotime(date('Y-12-01 H:i:s'));
+//        foreach (CrawlerUrl::get() as $crawler) {
+//            $time = $time + 14400;
+//            $date = date('Y-m-d H:i:s', $time);
+//            $crawler->balodi_publish_at = $date;
+//            $crawler->save();
+//        }
+//        die;
 //          $html = file_get_contents('https://24h.24hstatic.com/ajax/box_template_tin_bai_noi_bat_khac/index/76/1/14/0/0/0/0?v_is_ajax=1&v_device_global=pc&v_max_row=214&fk_listing_template=855&pk_listing_template_box=10494&v_type_box_template=tin_bai_noi_bat_khac&v_show_date=0&v_show_event=0&p_date=&v_view=6&t=1733246373');
 //        $dom = HtmlDomParser::str_get_html($html);
 //        foreach ($dom->find('article') as $a) {

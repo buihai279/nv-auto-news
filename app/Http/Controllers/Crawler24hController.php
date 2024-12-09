@@ -2,15 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\CrawlObserver\CrawleDetailNews;
-use App\CrawlObserver\CrawlerList24h;
-use App\CrawlObserver\CrawlerListLink24h;
-use App\CrawlObserver\CrawlerListSKDSNews;
-use App\CrawlObserver\CrawlerListVNENews;
-use App\CrawlObserver\CrawlerListZingNews;
 use App\Models\CrawlerUrl;
 use Illuminate\Support\Str;
-use Spatie\Crawler\Crawler;
 use voku\helper\HtmlDomParser;
 
 class Crawler24hController extends Controller
@@ -28,10 +21,11 @@ class Crawler24hController extends Controller
             $dom = HtmlDomParser::str_get_html($html);
             foreach ($dom->find('article') as $a) {
                 $url = $a->findOne('a')->getAttribute('href');
-                $src =$a->findOne('img')->getAttribute('src');
+                $src = $a->findOne('img')->getAttribute('src');
                 if (!Str::contains($url, 'https')) {
-                    $src =$a->findOne('img')->getAttribute('data-original');
+                    $src = $a->findOne('img')->getAttribute('data-original');
                 }
+                $src = Str::replace('255x170/', '', $src);
                 CrawlerUrl::updateOrCreate([
                     'url' => $url
                 ], [

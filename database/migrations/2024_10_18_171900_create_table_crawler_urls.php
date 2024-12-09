@@ -14,10 +14,13 @@ return new class extends Migration {
             $table->tinyText('site');
             $table->mediumText('html')->nullable();
             $table->string('thumbnail')->nullable();
+            $table->string('thumbnail_upload')->nullable();
             $table->timestamp('nvgate_publish_at')->nullable();
             $table->timestamp('vfilm_publish_at')->nullable();
             $table->timestamp('mfilm_publish_at')->nullable();
             $table->timestamp('balodi_publish_at')->nullable();
+            $table->string('balodi_id')->nullable();
+            $table->integer('balodi_category_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

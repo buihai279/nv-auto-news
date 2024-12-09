@@ -29,7 +29,7 @@ class CrawleDetailNews extends CrawlObserver
         if (Str::contains($url, 'vnexpress')) {
             $this->vnexpress($url, $html);
         }
-        if (Str::contains($url, 'www.24h.com.vn/du-lich-24h')) {
+        if (Str::contains($url, 'www.24h.com.vn/') && $url != 'https://www.24h.com.vn/') {
             $this->_24h($url, $html);
         }
 
@@ -48,7 +48,7 @@ class CrawleDetailNews extends CrawlObserver
         $html = Str::replace('<h4>Mời bạn đọc xem tiếp video:</h4>', '', $html);
         $html = Str::replace('<p><b>Xem thêm video đang được quan tâm:</b></p>', '', $html);
         $html = Str::replace('<h3>Xem thêm video đang được quan tâm:</h3>', '', $html);
-   CrawlerUrl::updateOrCreate([
+        CrawlerUrl::updateOrCreate([
             'url' => $url,
             'site' => 'suckhoedoisong',
         ], [
@@ -70,7 +70,7 @@ class CrawleDetailNews extends CrawlObserver
         $dom = HtmlDomParser::str_get_html($dom->findOne('.cate-24h-foot-arti-deta-info')->outerhtml);
         foreach ($dom->find('img') as $a) {
             $curFile = $a->getAttribute('src');
-            if (Str::contains( $a->getAttribute('src'),'data:image')) {
+            if (Str::contains($a->getAttribute('src'), 'data:image')) {
                 $a->setAttribute('src', $a->getAttribute('data-original'));
                 $curFile = $a->getAttribute('data-original');
                 $a->removeAttribute('data-original');
@@ -85,6 +85,7 @@ class CrawleDetailNews extends CrawlObserver
         }
         foreach ($dom->find('img') as $a) {
             $a->removeAttribute('style');
+            $a->removeAttribute('onclick');
         }
         foreach ($dom->find('div') as $a) {
             $a->removeAttribute('style');
@@ -98,15 +99,19 @@ class CrawleDetailNews extends CrawlObserver
         $dom->findOne('#zone_banner_sponser_product')->delete();
         $dom->findOne('#24h-banner-in-image')->delete();
         echo $html = $dom->outerhtml;
-
-CrawlerUrl::updateOrCreate([
-            'url' => $url,
-        ], [
-            'html' => $html,
-//            'thumbnail' => $file ?? '',
-//            'title' => $dom->findOne('h1')->text(),
-        ]);
+        $crawler = CrawlerUrl::firstWhere('url', $url);
+        if ($crawler) {
+            $crawler->html=$html;
+            $crawler->save();
+        } else {
+            CrawlerUrl::create([
+                'url' => $url,
+                'site' => '24h',
+                'html' => $html,
+            ]);
+        }
     }
+
     public function znews($url, $dom)
     {
         $domOrigin = $dom;
