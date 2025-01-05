@@ -8,13 +8,15 @@ use App\CrawlObserver\CrawlerListLink24h;
 use App\CrawlObserver\CrawlerListSKDSNews;
 use App\CrawlObserver\CrawlerListVNENews;
 use App\CrawlObserver\CrawlerListZingNews;
+use App\Enum\BalodiCategoryIdEnum;
 use App\Models\CrawlerUrl;
+use Illuminate\Http\Request;
 use Spatie\Crawler\Crawler;
 use voku\helper\HtmlDomParser;
 
 class TestController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
 
 //        $time = strtotime(date('Y-12-01 H:i:s'));
@@ -65,6 +67,12 @@ class TestController extends Controller
 //                ->setCrawlObserver(new CrawlerListZingNews())
 //                ->startCrawling($item);
 //        }
-        return view('dashboard.main', ['newss' => CrawlerUrl::orderByDesc('id')->paginate(10)]);
+        if ($request->get('q')){
+            $q = $request->get('q');
+            $crawler = CrawlerUrl::where('title', 'like', "%$q%")->paginate(10);
+        }else{
+            $crawler = CrawlerUrl::orderByDesc('id')->paginate(10);
+        }
+        return view('dashboard.main', ['categories'=>BalodiCategoryIdEnum::cases(),'newss' => $crawler]);
     }
 }

@@ -14,9 +14,8 @@ use Illuminate\Support\Str;
 use Spatie\Crawler\Crawler;
 use voku\helper\HtmlDomParser;
 
-class DetailController extends Controller
+class PushController extends Controller
 {
-
     public function __construct(protected CepCmsBalodiService $cepCmsBalodiService)
     {
     }
@@ -24,7 +23,8 @@ class DetailController extends Controller
     public function __invoke(Request $request)
     {
         $crawler = CrawlerUrl::where('url', $request->url)->first();
-        return view('dashboard.detail', ['html' => $crawler->html]);
+        $this->cepCmsBalodiService->sendContentPostBalody($crawler);
+        return redirect()->back();
     }
 
 

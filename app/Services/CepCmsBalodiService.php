@@ -11,23 +11,23 @@ use voku\helper\HtmlDomParser;
 
 class CepCmsBalodiService
 {
-    public $JSESSIONID = "JSESSIONID=CDA446E4657CB36D7FD67F8FB6B848E9; JSESSIONID=CDA446E4657CB36D7FD67F8FB6B848E9";
+    public $JSESSIONID = "JSESSIONID=681D0A1BB2D913886C1FFE57EB428411; JSESSIONID=681D0A1BB2D913886C1FFE57EB428411";
 
-    public function sendContentPostBalody($crawler)
+    public function sendContentPostBalody(CrawlerUrl $crawler)
     {
         $url = 'https://cepcms.vnptvas.vn/content_post.html';
 //        if (!empty($crawler->balodi_id)) {
 //            $url = "https://cepcms.vnptvas.vn/$crawler->balodi_id";
 //            $txtAnhMinhHoa = $this->getImage($crawler->balodi_id);
 //        }else{
-           $txtAnhMinhHoa = trim($this->uploadFile($crawler->thumbnail));
+        $txtAnhMinhHoa = trim($this->uploadFile($crawler->thumbnail));
 //        }
         $data = [
             'txtName' => $crawler->title,
             'txtStatus' => '1',
             'txtDes' => Str::limit(trim(strip_tags($crawler->html)), 250),
             'txtContent' => trim($crawler->html), // Rút gọn nội dung
-            'txtThoiGian' => $crawler->balodi_publish_at,
+            'txtThoiGian' => $crawler->balodi_publish_at?->format('d-m-Y H:i') ?? now()->format('d-m-Y H:i'),
             'txtAnhMinhHoa' => $txtAnhMinhHoa,
             'txtTheLoai' => $crawler->balodi_category_id,
             'txtPrice' => '0',
@@ -38,19 +38,14 @@ class CepCmsBalodiService
             'txtAuthor' => '',
             'txtTap' => '0',
             'btnUpdate' => '',
-            'txtGoiCuoc' => '1011284',
+            'txtGoiCuoc' => '1011284'
         ];
 
-        $query = http_build_query($data);
-        foreach ([1011285, 1011288, 1011289, 1011286, 1011287, 1011282, 1011283, 1011279, 1011281, 1011280] as $item) {
-            $query .= "&txtGoiCuoc=$item";
-        }
-        $response = $this->httpPost($url, $query);
+        $response = $this->httpPost($url, $data);
         // Trả về response
         Log::info($response);
-
         $this->listing($crawler->title);
-        echo ($response);
+//        echo  $response;die;
     }
 
     public function uploadFile($thumbnail)
@@ -124,9 +119,9 @@ class CepCmsBalodiService
 //                $id = Str::after(Str::before($tag->html, "','"), "('");
                 $title = $tag->text();
             }
-            if (!empty($tagLink->text()) && $href!=='#'&& !empty($title)) {
+            if (!empty($tagLink->text()) && $href !== '#' && !empty($title)) {
                 $crawler = CrawlerUrl::firstWhere('title', $title);
-                $link= Str::after(Str::before($tagLink->html, '" class='), '"');
+                $link = Str::after(Str::before($tagLink->html, '" class='), '"');
                 if ($crawler) {
                     $crawler->update([
                         'balodi_id' => $link,
@@ -138,56 +133,27 @@ class CepCmsBalodiService
 
     }
 
-    private function httpPost($url, $query)
-    { // Cấu hình cURL
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query); // Dữ liệu form-urlencoded
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Lấy kết quả trả về
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/x-www-form-urlencoded',
-            'Origin: https://cepcms.vnptvas.vn',
-            "Referer: $url",
-            'Upgrade-Insecure-Requests: 1',
-            'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'sec-ch-ua: "Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-            'sec-ch-ua-mobile: ?0',
-            'sec-ch-ua-platform: "macOS"',
-            'Cookie: ' . $this->JSESSIONID,
-        ]);
-        // Thực hiện request
-        $response = curl_exec($ch);
-
-        // Kiểm tra lỗi cURL
-        if (curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            curl_close($ch);
-            return response()->json(['error' => $error_msg], 500);
-        }
-        // Đóng cURL
-        curl_close($ch);
-        return $response;
-
+    private function httpPost($url, $data)
+    {
+        $response = Http::asForm()
+            ->withHeaders([
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Origin' => 'https://cepcms.vnptvas.vn',
+                'Referer' => $url,
+                'Upgrade-Insecure-Requests' => '1',
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'sec-ch-ua' => '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+                'sec-ch-ua-mobile' => '?0',
+                'Cookie' => $this->JSESSIONID,
+                'sec-ch-ua-platform' => '"macOS"',
+            ])
+            ->post($url, $data);
+        return $response->body();
     }
+
 
     public function getImage($id)
     {
-//        curl 'https://cepcms.vnptvas.vn/content_post.html?id=58728&key=4805475bdb309ac2b9c099091b758711533efe3fb963e2ac8233f75b00bbedf7' \
-//  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
-//  -H 'Accept-Language: en-US,en;q=0.9' \
-//  -H 'Cache-Control: max-age=0' \
-//  -H 'Connection: keep-alive' \
-//  -H 'Cookie: JSESSIONID=CDA446E4657CB36D7FD67F8FB6B848E9' \
-//  -H 'Sec-Fetch-Dest: document' \
-//  -H 'Sec-Fetch-Mode: navigate' \
-//  -H 'Sec-Fetch-Site: none' \
-//  -H 'Sec-Fetch-User: ?1' \
-//  -H 'Upgrade-Insecure-Requests: 1' \
-//  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' \
-//  -H 'sec-ch-ua: "Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"' \
-//  -H 'sec-ch-ua-mobile: ?0' \
-//  -H 'sec-ch-ua-platform: "macOS"'
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://cepcms.vnptvas.vn/$id");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -210,7 +176,7 @@ class CepCmsBalodiService
         $response = curl_exec($ch);
         curl_close($ch);
         Log::info($response);
-    return HtmlDomParser::str_get_html($response)->findOne('#txtAnhMinhHoa')->getAttribute('value');
+        return HtmlDomParser::str_get_html($response)->findOne('#txtAnhMinhHoa')->getAttribute('value');
     }
 
     public function listing($newTitle)
@@ -222,8 +188,7 @@ class CepCmsBalodiService
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: en-US,en;q=0.9',
             'Connection: keep-alive',
-            'Cookie: JSESSIONID=CDA446E4657CB36D7FD67F8FB6B848E9',
-            'Referer: https://cepcms.vnptvas.vn/content_post.html?id=59852&key=022348aec641376a1bb20ef665286316124d5da29c7a199fcd5e6ada7e7f68b8',
+            'Cookie: ' . $this->JSESSIONID,
             'Sec-Fetch-Dest: document',
             'Sec-Fetch-Mode: navigate',
             'Sec-Fetch-Site: same-origin',
@@ -247,17 +212,15 @@ class CepCmsBalodiService
 //                $id = Str::after(Str::before($tag->html, "','"), "('");
                 $title = $tag->text();
             }
-            if (!empty($tagLink->text()) && $href!=='#'&& !empty($title) && $title == $newTitle) {
+            if (!empty($tagLink->text()) && $href !== '#' && !empty($title) && $title == $newTitle) {
                 $crawler = CrawlerUrl::firstWhere('title', $title);
-                $link= Str::after(Str::before($tagLink->html, '" class='), '"');
+                $link = Str::after(Str::before($tagLink->html, '" class='), '"');
                 if ($crawler) {
-                    $crawler->update([
-                        'balodi_id' => $link,
-                    ]);
+                    $crawler->balodi_id = $link;
+                    $crawler->save();
                 }
                 break;
             }
-
         }
 
     }

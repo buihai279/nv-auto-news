@@ -9,12 +9,14 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "nunomaduro/collision": "^8.0-dev",
+        "owen-it/laravel-auditing": "^13.6",
         "spatie/crawler": "^8.2",
         "symfony/dom-crawler": "^7.1",
         "voku/portable-utf8": "^6.0",
         "voku/simple_html_dom": "^4.8"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.38",
