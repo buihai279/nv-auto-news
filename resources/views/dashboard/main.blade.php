@@ -49,7 +49,12 @@
                     @endphp
                 @endif
                 <br>
-            <td class="border px-4 py-2"></td>
+            <td class="border px-4 py-2">
+                @if($url['nvgate_publish_at'])
+                    ✔ Đã lên bài
+                @else
+                    <a href="{{route('publish-2-nvgate',['id'=>$url['id']])}}" class="underline">Đăng</a>
+                @endif</td>
             <td class="border px-4 py-2"></td>
             <td class="border px-4 py-2"></td>
         </tr>

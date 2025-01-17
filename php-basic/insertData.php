@@ -80,7 +80,7 @@ try {
     $result = $collection->insert($formattedData);
 
     if ($result) {
-        echo json_encode(["success" => true, "message" => "Dữ liệu đã chèn thành công."]);
+        echo json_encode(["success" => true, "message" => "Dữ liệu đã chèn thành công.", "data" => $result, "formattedData" => $formattedData]);
     } else {
         echo json_encode(["success" => false, "message" => "Chèn dữ liệu thất bại."]);
     }

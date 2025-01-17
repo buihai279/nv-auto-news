@@ -11,7 +11,7 @@ use voku\helper\HtmlDomParser;
 
 class CepCmsBalodiService
 {
-    public $JSESSIONID = "JSESSIONID=681D0A1BB2D913886C1FFE57EB428411; JSESSIONID=681D0A1BB2D913886C1FFE57EB428411";
+    public $JSESSIONID = "JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5; JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5";
 
     public function sendContentPostBalody(CrawlerUrl $crawler)
     {
@@ -162,7 +162,7 @@ class CepCmsBalodiService
             'Accept-Language: en-US,en;q=0.9',
             'Cache-Control: max-age=0',
             'Connection: keep-alive',
-            'Cookie: JSESSIONID=CDA446E4657CB36D7FD67F8FB6B848E9',
+            'Cookie: JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5',
             'Sec-Fetch-Dest: document',
             'Sec-Fetch-Mode: navigate',
             'Sec-Fetch-Site: none',
