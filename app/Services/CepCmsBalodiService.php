@@ -11,7 +11,7 @@ use voku\helper\HtmlDomParser;
 
 class CepCmsBalodiService
 {
-    public $JSESSIONID = "JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5; JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5";
+    public $JSESSIONID = "JSESSIONID=6D0E0B1F6B7FE47FE8834B1C47D922B4; JSESSIONID=6D0E0B1F6B7FE47FE8834B1C47D922B4";
 
     public function sendContentPostBalody(CrawlerUrl $crawler)
     {
@@ -51,7 +51,7 @@ class CepCmsBalodiService
     public function uploadFile($thumbnail)
     {
         //cache
-        return Cache::remember($thumbnail, 60 * 60 * 24, function () use ($thumbnail) {
+        return Cache::remember($thumbnail.'222', 60 * 60 * 24, function () use ($thumbnail) {
             $url = 'https://cepcms.vnptvas.vn/upload_img?sessionkey=' . $this->getSessionId();
             // Headers cần gửi
             $headers = [
@@ -59,7 +59,7 @@ class CepCmsBalodiService
                 'Accept-Language' => 'en-US,en;q=0.9',
                 'Cache-Control' => 'no-cache',
                 'Connection' => 'keep-alive',
-                'Cookie' => $this->JSESSIONID,
+                'Cookie' => 'JSESSIONID=6D0E0B1F6B7FE47FE8834B1C47D922B4',
                 'Origin' => 'https://cepcms.vnptvas.vn',
                 'Pragma' => 'no-cache',
                 'Referer' => 'https://cepcms.vnptvas.vn/content_post.html',
@@ -135,19 +135,24 @@ class CepCmsBalodiService
 
     private function httpPost($url, $data)
     {
-        $response = Http::asForm()
-            ->withHeaders([
-                'Content-Type' => 'application/x-www-form-urlencoded',
-                'Origin' => 'https://cepcms.vnptvas.vn',
-                'Referer' => $url,
-                'Upgrade-Insecure-Requests' => '1',
-                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                'sec-ch-ua' => '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-                'sec-ch-ua-mobile' => '?0',
-                'Cookie' => $this->JSESSIONID,
-                'sec-ch-ua-platform' => '"macOS"',
-            ])
-            ->post($url, $data);
+        try {
+
+            $response = Http::asForm()
+                ->withHeaders([
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Origin' => 'https://cepcms.vnptvas.vn',
+                    'Referer' => $url,
+                    'Upgrade-Insecure-Requests' => '1',
+                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                    'sec-ch-ua' => '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+                    'sec-ch-ua-mobile' => '?0',
+                    'Cookie' =>'JSESSIONID=6D0E0B1F6B7FE47FE8834B1C47D922B4',
+                    'sec-ch-ua-platform' => '"macOS"',
+                ])
+                ->post($url, $data);
+        }catch (\Exception $exception){
+          dd($exception->getMessage());
+        }
         return $response->body();
     }
 
@@ -162,7 +167,7 @@ class CepCmsBalodiService
             'Accept-Language: en-US,en;q=0.9',
             'Cache-Control: max-age=0',
             'Connection: keep-alive',
-            'Cookie: JSESSIONID=5C763F81321935E1B1789B09FA2FD3A5',
+            'Cookie: JSESSIONID=6D0E0B1F6B7FE47FE8834B1C47D922B4',
             'Sec-Fetch-Dest: document',
             'Sec-Fetch-Mode: navigate',
             'Sec-Fetch-Site: none',

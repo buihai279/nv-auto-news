@@ -23,7 +23,21 @@ class PushController extends Controller
     public function __invoke(Request $request)
     {
         $crawler = CrawlerUrl::where('url', $request->url)->first();
-        $this->cepCmsBalodiService->sendContentPostBalody($crawler);
+
+        //chay 1 lan
+        if (empty($crawler->html)) {
+            $crawlers=CrawlerUrl::whereNull('html')->limit(100)->get();
+            foreach ($crawlers as $crawler) {
+                Crawler::create()
+//            ->setCrawlQueue($queue)
+                    ->setCurrentCrawlLimit(2)
+                    ->setMaximumDepth(2)
+                    ->setCrawlObserver(new CrawleDetailNews())
+                    ->startCrawling($crawler->url);
+            }
+        }
+        //chay 1 lan
+//        $this->cepCmsBalodiService->sendContentPostBalody($crawler);
         return redirect()->back();
     }
 

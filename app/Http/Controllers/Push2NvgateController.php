@@ -74,6 +74,6 @@ class Push2NvgateController extends Controller
         $file = file_get_contents($thumb);
         $fileName = basename($thumb);
         $response = Http::attach('image', $file, rand(1, 1000) . $fileName)->post('http://app.nvgate.vn/8004/');
-        return Str::replace("/opt/www/nvgate/nvgate_cms/app/",'',$response->json()['path']);
+      return Str::replace("/opt/www/nvgate/nvgate_cms/app/",'',$response->json()['path']);
     }
 }
